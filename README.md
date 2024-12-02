@@ -1,1 +1,1 @@
-# aefinder-contracts
+# AeFinder Contracts
