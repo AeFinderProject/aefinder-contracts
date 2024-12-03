@@ -1,0 +1,189 @@
+syntax = "proto3";
+
+import "aelf/options.proto";
+import "aelf/core.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
+import "Protobuf/reference/acs12.proto";
+// The namespace of this class
+option csharp_namespace = "AeFinder.Contracts";
+
+service BillingContract {
+  // The name of the state class the smart contract is going to use to access blockchain state
+  option (aelf.csharp_state) = "AeFinder.Contracts.BillingContractState";
+  option (aelf.base) = "Protobuf/reference/acs12.proto";
+
+  rpc Initialize (InitializeInput) returns (google.protobuf.Empty) {
+  }
+
+  rpc SetAdmin (aelf.Address) returns (google.protobuf.Empty) {
+  }
+
+  rpc SetTreasurer (aelf.Address) returns (google.protobuf.Empty) {
+  }
+
+  rpc SetFeeAddress (aelf.Address) returns (google.protobuf.Empty) {
+  }
+
+  rpc SetFeeSymbol (SymbolList) returns (google.protobuf.Empty) {
+  }
+
+  rpc Deposit (DepositInput) returns (google.protobuf.Empty) {
+  }
+
+  rpc Withdraw (WithdrawInput) returns (google.protobuf.Empty) {
+  }
+
+  rpc Lock (LockInput) returns (google.protobuf.Empty) {
+  }
+
+  rpc LockFrom (LockFromInput) returns (google.protobuf.Empty) {
+  }
+
+  rpc Charge (ChargeInput) returns (google.protobuf.Empty) {
+  }
+
+  // Views (methods that don't modify contract state)
+  rpc GetAdmin (google.protobuf.Empty) returns (aelf.Address) {
+    option (aelf.is_view) = true;
+  }
+
+  rpc GetTreasurer (google.protobuf.Empty) returns (aelf.Address) {
+    option (aelf.is_view) = true;
+  }
+
+  rpc GetFeeAddress (google.protobuf.Empty) returns (aelf.Address) {
+    option (aelf.is_view) = true;
+  }
+
+  rpc GetFeeSymbols (google.protobuf.Empty) returns (SymbolList) {
+    option (aelf.is_view) = true;
+  }
+
+  rpc GetBalance (GetBalanceInput) returns (GetBalanceOutput) {
+    option (aelf.is_view) = true;
+  }
+}
+
+message InitializeInput {
+  aelf.Address admin = 1;
+  aelf.Address treasurer = 2;
+  aelf.Address fee_address = 3;
+  SymbolList symbols = 4;
+}
+
+message SymbolList {
+  repeated string value = 1;
+}
+
+message Organization{
+  aelf.Address address = 1; //Organization address
+  repeated OrganizationMember members = 2;
+}
+
+enum OrganizationMemberRole {
+  Admin = 0;
+  Member = 1;
+}
+
+message OrganizationMember{
+  aelf.Address address = 1; //Organization member address
+  OrganizationMemberRole role = 2;
+}
+
+message DepositInput {
+  string symbol = 1;
+  int64 amount = 2;
+}
+
+message WithdrawInput{
+  string symbol = 1;
+  int64 amount = 2;
+  aelf.Address address = 3;
+}
+
+message LockInput {
+  string symbol = 1;
+  int64 amount = 2;
+  string billing_id = 3;
+}
+
+message LockFromInput {
+  aelf.Address address = 1;
+  string symbol = 2;
+  int64 amount = 3;
+  string billing_id = 4;
+}
+
+message ChargeInput {
+  aelf.Address address = 1;
+  string symbol = 2;
+  int64 charge_amount = 3;
+  int64 unlock_amount = 4;
+  string billing_id = 5;
+}
+
+message GetBalanceInput {
+  aelf.Address address = 1;
+  string Symbol = 2;
+}
+
+message GetBalanceOutput {
+  int64 balance = 1;
+  int64 locked_balance = 2;
+}
+
+message FeeSymbolSet {
+  option (aelf.is_event) = true;
+  SymbolList symbols = 1;
+}
+
+message OrganizationCreated{
+  option (aelf.is_event) = true;
+  aelf.Address address = 1; //Organization address
+  OrganizationMemberList members = 2;
+}
+
+message OrganizationMemberList {
+  repeated OrganizationMember value = 1;
+}
+
+message Deposited {
+  option (aelf.is_event) = true;
+  aelf.Address address = 1;
+  string symbol = 2;
+  int64 amount = 3;
+}
+
+message Withdrawn {
+  option (aelf.is_event) = true;
+  aelf.Address address = 1;
+  string symbol = 2;
+  int64 amount = 3;
+  aelf.Address to_address = 4;
+}
+
+message Locked {
+  option (aelf.is_event) = true;
+  aelf.Address address = 1;
+  string symbol = 2;
+  int64 amount = 3;
+  string billing_id  = 4;
+}
+
+message Charged {
+  option (aelf.is_event) = true;
+  aelf.Address address = 1;
+  string symbol = 2;
+  int64 charged_amount = 3;
+  int64 unlocked_amount = 4;
+  string billing_id  = 5;
+}
+
+message FeeReceived {
+  option (aelf.is_event) = true;
+  aelf.Address user_address = 1;
+  aelf.Address fee_address = 2;
+  string symbol = 3;
+  int64 amount = 4;
+}
